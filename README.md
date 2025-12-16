@@ -1,3 +1,5 @@
+[![Test SecureShred](https://github.com/strabo231/secureshred/actions/workflows/test.yml/badge.svg)](https://github.com/strabo231/secureshred/actions/workflows/test.yml)
+
 # SecureShred - Secure File Deletion Tool
 
 `rm` doesn't actually delete - data remains recoverable. SecureShred overwrites data multiple times for true deletion.
