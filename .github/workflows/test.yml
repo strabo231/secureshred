@@ -73,8 +73,9 @@ jobs:
     - name: Verify script structure
       run: |
         grep -q "shred_file()" secureshred
-        grep -q "dod_method()" secureshred
-        grep -q "gutmann_method()" secureshred
+        grep -q "shred_directory()" secureshred
+        grep -q "perform_shred()" secureshred
+        grep -q "show_usage()" secureshred
         echo "✓ Script structure verified"
     
     - name: All tests passed
