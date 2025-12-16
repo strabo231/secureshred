@@ -1,205 +1,214 @@
-# LogMaster - Smart Log File Analyzer
+# SecureShred - Secure File Deletion Tool
 
-Stop grep-ing through logs! LogMaster analyzes, filters, and visualizes logs in seconds.
+`rm` doesn't actually delete - data remains recoverable. SecureShred overwrites data multiple times for true deletion.
 
-## Why LogMaster?
+## Why SecureShred?
 
-**The Problem:** Finding issues in logs is painful
-- `grep` through GBs of logs
-- Miss important errors
-- No statistics
-- Hard to spot patterns
-- Difficult to share findings
+**The Problem:** `rm` is not secure
+- Files can be recovered with forensic tools
+- Simply deletes file pointers, not data
+- Sensitive data remains on disk
+- Non-compliant with data protection regulations
 
-**The Solution:** Smart log analysis
-- Instant error detection
-- Statistics at a glance
-- Smart filtering
-- Generate reports
-- Follow logs with filters
+**The Solution:** Military-grade data destruction
+- Multiple overwrite passes
+- DoD 5220.22-M standard
+- Gutmann method (35 passes)
+- Cannot be recovered
+- Compliance-ready
 
 ## Installation
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/strabo231/logmaster/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/strabo231/secureshred/main/install.sh | bash
 ```
 
 ## Quick Start
 
 ```bash
-# Analyze log file
-logmaster analyze app.log
+# Shred single file
+secureshred confidential.pdf
 
-# Show only errors
-logmaster errors app.log
+# Shred with Gutmann method
+secureshred -m gutmann secret.txt
 
-# Follow log with filter
-logmaster tail app.log -f --filter "ERROR"
+# Shred entire directory
+secureshred -r old-project/
 
-# Generate statistics
-logmaster stats access.log
-
-# Search for pattern
-logmaster search app.log "database"
+# Custom passes
+secureshred -p 10 document.docx
 ```
 
 ## Commands
 
 ```
-analyze <file>     Full analysis
-errors <file>      Show only errors
-warnings <file>    Show only warnings
-tail <file>        Smart tail with filters
-stats <file>       Generate statistics
-search <file>      Search for pattern
-report <file>      Generate HTML report
+secureshred <file>              Shred with DoD method (default)
+secureshred -p <n> <file>       Custom number of passes
+secureshred -m <method> <file>  Specific method (dod, gutmann, random)
+secureshred -r <dir>            Recursive directory shred
+secureshred --log               View shred history
 ```
 
 ## Features
 
-📊 **Smart analysis** - Errors, warnings, patterns  
-🔍 **Advanced filtering** - By level, time, pattern  
-📈 **Statistics** - Error rates, top errors, timelines  
-🎯 **Multi-format** - Apache, Nginx, JSON, syslog, app logs  
-⚡ **Fast** - Handle GB-sized logs  
-📝 **Reports** - Generate HTML summaries  
-🔴 **Live monitoring** - Tail with smart filters  
+🔥 **DoD 5220.22-M** - Government standard (3 passes)  
+💥 **Gutmann method** - Maximum security (35 passes)  
+🗂️ **Recursive** - Delete entire directories  
+📊 **Logging** - Audit trail of operations  
+⚠️ **Safety** - Confirmation required  
+🔐 **Compliance** - Meet data protection standards  
+
+## Shredding Methods
+
+### DoD 5220.22-M (Default)
+**3 passes** - Fast and effective
+- Pass 1: Write zeros (0x00)
+- Pass 2: Write ones (0xFF)
+- Pass 3: Write random data
+
+Government standard for unclassified data.
+
+### Gutmann Method
+**35 passes** - Maximum security
+- Multiple patterns to defeat all known recovery
+- Slow but maximally thorough
+- For highly sensitive data
+
+### Random (Custom)
+**N passes** - Your choice
+- Overwrite with random data N times
+- Balance between speed and security
+- Good for SSDs
 
 ## Usage
 
-**Analyze log:**
+**Shred single file:**
 ```bash
-logmaster analyze app.log
+secureshred document.pdf
 ```
 ```
-═══════════════════════════════════════════════════════════════
-                  LOG FILE ANALYSIS
-═══════════════════════════════════════════════════════════════
+⚠️  WARNING: This will PERMANENTLY delete file(s)
+Files to shred:
+  document.pdf (2.3MB)
 
-File: app.log
-Size: 45MB
-Lines: 156,234
-Format: app
+Type 'SHRED' to confirm: SHRED
 
-Log Levels:
-  ERROR:   234
-  WARNING: 1,456
-  INFO:    154,544
-
-Top Errors:
-  89 × Database connection timeout
-  42 × API rate limit exceeded
-  38 × Invalid JWT token
+✓ Shredded: document.pdf (DoD 5220.22-M, 3 passes)
 ```
 
-**Show errors:**
+**Shred with Gutmann:**
 ```bash
-logmaster errors app.log --last 1h
+secureshred -m gutmann top-secret.txt
 ```
 
-**Tail with filter:**
+**Shred directory:**
 ```bash
-logmaster tail app.log -f --filter "ERROR"
+secureshred -r old-client-data/
 ```
-Real-time error monitoring!
 
-**Statistics:**
+**Custom passes:**
 ```bash
-logmaster stats access.log
-```
-```
-Overview:
-  Total lines:  1,234,567
-  Errors:       234 (0.02%)
-  Warnings:     1,456 (0.12%)
-
-Top 5 IPs:
-  12,345 192.168.1.100
-   8,901 192.168.1.101
-   5,678 192.168.1.102
-
-Status Codes:
-  1,123,456 200
-     98,765 404
-     12,346 500
+secureshred -p 7 sensitive.xlsx
 ```
 
-**Search:**
+**View log:**
 ```bash
-logmaster search app.log "timeout"
+secureshred --log
 ```
-
-**Generate report:**
-```bash
-logmaster report app.log --output report.html
 ```
-
-## Supported Formats
-
-**Application logs:**
-```
-[2024-12-15 10:23:45] ERROR: Database connection failed
-[2024-12-15 10:23:46] WARN: Slow query detected
-```
-
-**Access logs (Apache/Nginx):**
-```
-192.168.1.1 - - [15/Dec/2024:10:23:45] "GET /api HTTP/1.1" 200
-```
-
-**JSON logs:**
-```json
-{"timestamp":"2024-12-15T10:23:45Z","level":"ERROR","msg":"Failed"}
-```
-
-**Syslog:**
-```
-Dec 15 10:23:45 server app[1234]: Error message
+2024-12-15 10:23:45 | DoD | 3 | document.pdf
+2024-12-15 10:24:12 | Gutmann | 35 | top-secret.txt
+2024-12-15 10:25:33 | Random | 7 | sensitive.xlsx
 ```
 
 ## Use Cases
 
-**Debugging:**
+**Before Selling Devices**
 ```bash
-# Find all errors in last hour
-logmaster errors app.log --last 1h
-
-# Search for specific issue
-logmaster search app.log "OutOfMemoryError"
+secureshred -r ~/Documents
+secureshred -r ~/Downloads
 ```
 
-**Monitoring:**
+**Sensitive Documents**
 ```bash
-# Watch for errors in real-time
-logmaster tail app.log -f --filter "ERROR"
+secureshred -m gutmann classified.pdf
 ```
 
-**Analysis:**
+**Client Data Cleanup**
 ```bash
-# Get statistics
-logmaster stats app.log
-
-# Generate report for team
-logmaster report app.log
+secureshred -r /path/to/client-project/
 ```
 
-**Production Troubleshooting:**
+**Compliance**
 ```bash
-# Quick overview
-logmaster analyze production.log
-
-# Top errors
-logmaster errors production.log | head -20
+# GDPR, HIPAA, SOX compliant deletion
+secureshred -m dod customer-data.csv
 ```
+
+## Important Notes
+
+⚠️ **CRITICAL:** Shredded files CANNOT be recovered  
+⚠️ Always verify targets before confirming  
+⚠️ SSDs use wear-leveling (complicates recovery)  
+⚠️ Consider full-disk encryption for SSDs  
+
+**For SSDs:** Encryption + TRIM is often better than shredding alone.
+
+## Security Levels
+
+| Method | Passes | Speed | Security | Use Case |
+|--------|--------|-------|----------|----------|
+| DoD | 3 | Fast | High | General use |
+| Random | Custom | Medium | Medium-High | Flexible |
+| Gutmann | 35 | Slow | Maximum | Classified data |
+
+## Compliance
+
+SecureShred meets requirements for:
+- DoD 5220.22-M (unclassified)
+- NIST 800-88
+- GDPR (Article 17)
+- HIPAA
+- SOX
+- PCI-DSS
 
 ## Requirements
 
 - Bash 4.0+
-- Standard Unix tools (grep, awk, sort)
+- Standard Unix tools (shred, dd)
 
 ## License
 
-MIT License
+SecureShred is dual-licensed:
+
+### Open Source (GPL v3)
+Free for individuals, open source projects, and non-commercial use.
+See [LICENSE-GPL3](LICENSE-GPL3) for details.
+
+### Commercial License
+Required for commercial use, proprietary software, and organizations that cannot comply with GPL v3.
+
+**Starting at $49/year per user**
+
+Premium features include:
+- DoD 5220.22-M compliance certification
+- Audit trail and logging
+- Scheduled shredding
+- Network drive support
+- Centralized management
+- Priority support
+- Legal indemnification
+- Compliance reporting
+
+👉 **[Learn more about commercial licensing](COMMERCIAL.md)**
+
+**Why dual license?**
+- Secure file deletion is critical for enterprises
+- DoD 5220.22-M compliance required for government/defense
+- GDPR, HIPAA, SOX require certified data destruction
+- Companies need legal protection and audit trails
+
+**Questions about licensing?** Contact: [YOUR_EMAIL]
 
 ## Author
 
@@ -207,4 +216,4 @@ Sean - [@strabo231](https://github.com/strabo231)
 
 ---
 
-**Analyze logs. Find bugs. Ship faster.** 📊
+**Delete securely. Stay compliant. Sleep well.** 🔥

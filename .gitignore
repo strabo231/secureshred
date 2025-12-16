@@ -1,4 +1,20 @@
+# SecureShred logs
+.secureshred/
+shred.log
+
+# Test files
 test/
-*.log
-*.html
+tests/
+*.test
+test-shred/
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# OS files
 .DS_Store
+Thumbs.db

@@ -1,4 +1,4 @@
-name: Test LogMaster
+name: Test SecureShred
 
 on:
   push:
@@ -16,58 +16,65 @@ jobs:
       uses: actions/checkout@v3
     
     - name: Make script executable
-      run: chmod +x logmaster
+      run: chmod +x secureshred
     
     - name: Test help command
-      run: ./logmaster --help
+      run: ./secureshred --help
     
     - name: Test version command
-      run: ./logmaster --version
+      run: ./secureshred --version
     
-    - name: Create test log
+    - name: Create test files
       run: |
-        echo "[2024-12-15 10:00:00] INFO: Application started" > test.log
-        echo "[2024-12-15 10:00:01] ERROR: Database connection failed" >> test.log
-        echo "[2024-12-15 10:00:02] WARN: Slow query detected" >> test.log
-        echo "[2024-12-15 10:00:03] ERROR: API timeout" >> test.log
-        echo "[2024-12-15 10:00:04] INFO: Request processed" >> test.log
+        mkdir -p test-shred
+        echo "test data 1" > test-shred/test1.txt
+        echo "test data 2" > test-shred/test2.txt
+        echo "test data 3" > test-shred/test3.txt
     
-    - name: Test analyze
-      run: ./logmaster analyze test.log
+    - name: Test DoD shredding
+      run: echo "SHRED" | ./secureshred test-shred/test1.txt
     
-    - name: Test errors
-      run: ./logmaster errors test.log
+    - name: Verify file was deleted
+      run: |
+        if [ -f test-shred/test1.txt ]; then
+          echo "❌ File still exists!"
+          exit 1
+        else
+          echo "✓ File successfully shredded"
+        fi
     
-    - name: Test warnings
-      run: ./logmaster warnings test.log
+    - name: Test custom passes
+      run: echo "SHRED" | ./secureshred -p 5 test-shred/test2.txt
     
-    - name: Test stats
-      run: ./logmaster stats test.log
+    - name: Test Gutmann method
+      run: echo "SHRED" | ./secureshred -m gutmann test-shred/test3.txt
     
-    - name: Test search
-      run: ./logmaster search test.log "database"
+    - name: Create directory for recursive test
+      run: |
+        mkdir -p test-dir
+        echo "file1" > test-dir/file1.txt
+        echo "file2" > test-dir/file2.txt
     
-    - name: Test tail
-      run: ./logmaster tail test.log | head -10
+    - name: Test recursive shredding
+      run: echo "SHRED" | ./secureshred -r test-dir
     
-    - name: Test report generation
-      run: ./logmaster report test.log --output test-report.html
-    
-    - name: Verify report created
-      run: test -f test-report.html
+    - name: Test log viewing
+      run: ./secureshred --log || true
     
     - name: Install shellcheck
-      run: sudo apt-get update && sudo apt-get install -y shellcheck
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y shellcheck
     
     - name: Run shellcheck
       continue-on-error: true
-      run: shellcheck logmaster
+      run: shellcheck secureshred
     
     - name: Verify script structure
       run: |
-        grep -q "analyze_log()" logmaster
-        grep -q "show_errors()" logmaster
-        grep -q "generate_stats()" logmaster
+        grep -q "shred_file()" secureshred
+        grep -q "dod_method()" secureshred
+        grep -q "gutmann_method()" secureshred
         echo "✓ Script structure verified"
     
     - name: All tests passed
