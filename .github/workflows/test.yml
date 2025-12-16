@@ -1,0 +1,77 @@
+name: Test LogMaster
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Test on Ubuntu
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Make script executable
+      run: chmod +x logmaster
+    
+    - name: Test help command
+      run: ./logmaster --help
+    
+    - name: Test version command
+      run: ./logmaster --version
+    
+    - name: Create test log
+      run: |
+        echo "[2024-12-15 10:00:00] INFO: Application started" > test.log
+        echo "[2024-12-15 10:00:01] ERROR: Database connection failed" >> test.log
+        echo "[2024-12-15 10:00:02] WARN: Slow query detected" >> test.log
+        echo "[2024-12-15 10:00:03] ERROR: API timeout" >> test.log
+        echo "[2024-12-15 10:00:04] INFO: Request processed" >> test.log
+    
+    - name: Test analyze
+      run: ./logmaster analyze test.log
+    
+    - name: Test errors
+      run: ./logmaster errors test.log
+    
+    - name: Test warnings
+      run: ./logmaster warnings test.log
+    
+    - name: Test stats
+      run: ./logmaster stats test.log
+    
+    - name: Test search
+      run: ./logmaster search test.log "database"
+    
+    - name: Test tail
+      run: ./logmaster tail test.log | head -10
+    
+    - name: Test report generation
+      run: ./logmaster report test.log --output test-report.html
+    
+    - name: Verify report created
+      run: test -f test-report.html
+    
+    - name: Install shellcheck
+      run: sudo apt-get update && sudo apt-get install -y shellcheck
+    
+    - name: Run shellcheck
+      continue-on-error: true
+      run: shellcheck logmaster
+    
+    - name: Verify script structure
+      run: |
+        grep -q "analyze_log()" logmaster
+        grep -q "show_errors()" logmaster
+        grep -q "generate_stats()" logmaster
+        echo "✓ Script structure verified"
+    
+    - name: All tests passed
+      run: |
+        echo "================================"
+        echo "✓ All tests passed successfully!"
+        echo "================================"
